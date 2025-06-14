@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { ElMessage } from 'element-plus'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      redirect: '/login'
+      name: 'Home',
+      component: () => import('@/views/Home.vue'),
+      meta: { requiresAuth: true }
     },
     {
       path: '/login',
@@ -16,8 +19,7 @@ const router = createRouter({
     },
     {
       path: '/admin',
-      name: 'Admin',
-      component: () => import('@/views/admin/AdminLayout.vue'),
+      component: () => import('@/views/MainLayout.vue'),
       meta: { requiresAuth: true, userType: 1 },
       children: [
         {
@@ -27,7 +29,27 @@ const router = createRouter({
         {
           path: 'dashboard',
           name: 'AdminDashboard',
-          component: () => import('@/views/admin/Dashboard.vue')
+          component: () => import('@/views/admin/AdminDashboard.vue')
+        },
+        {
+          path: 'course-info',
+          name: 'CourseInfoManagement',
+          component: () => import('@/views/admin/CourseInfoManagement.vue')
+        },
+        {
+          path: 'schedule',
+          name: 'ScheduleManagement',
+          component: () => import('@/views/admin/ScheduleManagement.vue')
+        },
+        {
+          path: 'score-info',
+          name: 'ScoreInfoManagement',
+          component: () => import('@/views/admin/ScoreInfoManagement.vue')
+        },
+        {
+          path: 'score-statistics',
+          name: 'ScoreStatistics',
+          component: () => import('@/views/admin/ScoreStatistics.vue')
         },
         {
           path: 'users',
@@ -35,21 +57,15 @@ const router = createRouter({
           component: () => import('@/views/admin/UserManagement.vue')
         },
         {
-          path: 'courses',
-          name: 'CourseManagement',
-          component: () => import('@/views/admin/CourseManagement.vue')
-        },
-        {
-          path: 'scores',
-          name: 'ScoreManagement',
-          component: () => import('@/views/admin/ScoreManagement.vue')
+          path: 'accounts',
+          name: 'AccountManagement',
+          component: () => import('@/views/admin/AccountManagement.vue')
         }
       ]
     },
     {
       path: '/teacher',
-      name: 'Teacher',
-      component: () => import('@/views/teacher/TeacherLayout.vue'),
+      component: () => import('@/views/MainLayout.vue'),
       meta: { requiresAuth: true, userType: 2 },
       children: [
         {
@@ -59,24 +75,23 @@ const router = createRouter({
         {
           path: 'dashboard',
           name: 'TeacherDashboard',
-          component: () => import('@/views/teacher/Dashboard.vue')
+          component: () => import('@/views/teacher/TeacherDashboard.vue')
         },
         {
           path: 'schedule',
           name: 'TeacherSchedule',
-          component: () => import('@/views/teacher/Schedule.vue')
+          component: () => import('@/views/teacher/TeacherSchedule.vue')
         },
         {
           path: 'scores',
           name: 'TeacherScores',
-          component: () => import('@/views/teacher/ScoreQuery.vue')
+          component: () => import('@/views/teacher/TeacherScores.vue')
         }
       ]
     },
     {
       path: '/student',
-      name: 'Student',
-      component: () => import('@/views/student/StudentLayout.vue'),
+      component: () => import('@/views/MainLayout.vue'),
       meta: { requiresAuth: true, userType: 3 },
       children: [
         {
@@ -86,17 +101,17 @@ const router = createRouter({
         {
           path: 'dashboard',
           name: 'StudentDashboard',
-          component: () => import('@/views/student/Dashboard.vue')
+          component: () => import('@/views/student/StudentDashboard.vue')
         },
         {
           path: 'schedule',
           name: 'StudentSchedule',
-          component: () => import('@/views/student/Schedule.vue')
+          component: () => import('@/views/student/StudentSchedule.vue')
         },
         {
           path: 'scores',
           name: 'StudentScores',
-          component: () => import('@/views/student/ScoreQuery.vue')
+          component: () => import('@/views/student/StudentScores.vue')
         }
       ]
     }
@@ -107,26 +122,48 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   
+  console.log('路由守卫检查:', {
+    to: to.path,
+    token: userStore.token,
+    userInfo: userStore.userInfo
+  })
+  
   if (to.meta.requiresAuth) {
     if (!userStore.token) {
+      ElMessage.warning('请先登录')
+      next('/login')
+      return
+    }
+    
+    // 检查用户信息是否完整
+    if (!userStore.userInfo || typeof userStore.userInfo.userType === 'undefined' || userStore.userInfo.userType === null) {
+      console.error('用户信息检查失败:', {
+        userInfo: userStore.userInfo,
+        userType: userStore.userInfo?.userType
+      })
+      ElMessage.error('用户信息不完整，请重新登录')
+      userStore.logout()
       next('/login')
       return
     }
     
     // 检查用户类型权限
-    if (to.meta.userType && userStore.userInfo?.userType !== to.meta.userType) {
+    if (to.meta.userType && userStore.userInfo.userType !== to.meta.userType) {
+      ElMessage.warning('您没有权限访问该页面')
       // 根据用户类型重定向到对应的首页
-      switch (userStore.userInfo?.userType) {
+      switch (userStore.userInfo.userType) {
         case 1:
-          next('/admin')
+          next('/admin/dashboard')
           break
         case 2:
-          next('/teacher')
+          next('/teacher/dashboard')
           break
         case 3:
-          next('/student')
+          next('/student/dashboard')
           break
         default:
+          ElMessage.error('用户类型未知，请重新登录')
+          userStore.logout()
           next('/login')
       }
       return

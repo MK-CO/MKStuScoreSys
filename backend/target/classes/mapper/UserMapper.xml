@@ -31,11 +31,11 @@
     </sql>
 
     <!-- 根据用户名和用户类型查询用户 -->
-    <select id="selectByUsernameAndUserType" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List" />
-        FROM sys_user
+    <select id="selectByUsernameAndType" resultMap="BaseResultMap">
+        SELECT * FROM sys_user 
         WHERE username = #{username} 
-        AND user_type = #{userType}
+        AND user_type = #{userType} 
+        AND status = 1 
         AND deleted = 0
     </select>
 

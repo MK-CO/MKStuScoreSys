@@ -6,7 +6,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
- * 登录请求参数
+ * 登录请求DTO
  *
  * @author MKStu
  * @date 2024-01-01

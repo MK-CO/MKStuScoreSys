@@ -96,7 +96,7 @@ install-windows.bat
 |--------|-----|
 | 主机 | localhost |
 | 端口 | 3306 |
-| 数据库名 | studb |
+| 数据库名 | score_system |
 | Root 用户密码 | root123456 |
 | 管理员用户名 | admin |
 | 管理员密码 | admin123456 |
@@ -212,7 +212,7 @@ net stop MySQL80 && net start MySQL80
 mysql -h localhost -u root -p
 
 # 使用 admin 用户连接
-mysql -h localhost -u admin -p studb
+mysql -h localhost -u admin -p score_system
 ```
 
 ### 使用 Web 界面（Docker 版本）
@@ -223,7 +223,7 @@ mysql -h localhost -u admin -p studb
    - 服务器：mysql-local（或 localhost）
    - 用户名：admin
    - 密码：admin123456
-   - 数据库：studb
+   - 数据库：score_system
 
 ## 🛠️ 新版本脚本特性
 

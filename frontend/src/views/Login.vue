@@ -217,20 +217,8 @@ const handleLogin = async () => {
     if (result.success) {
       ElMessage.success('登录成功')
       
-      // 根据用户类型跳转到对应页面
-      switch (result.data.userType) {
-        case 1:
-          router.push('/admin')
-          break
-        case 2:
-          router.push('/teacher')
-          break
-        case 3:
-          router.push('/student')
-          break
-        default:
-          router.push('/')
-      }
+      // 登录成功后跳转到首页
+      router.push('/')
     } else {
       ElMessage.error(result.message || '登录失败')
     }

@@ -37,11 +37,11 @@ echo 2. 连接到 MySQL:
 echo    mysql -u root -p
 echo.
 echo 3. 执行以下 SQL 命令:
-echo    CREATE DATABASE IF NOT EXISTS studb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-echo    CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin123456';
-echo    GRANT ALL PRIVILEGES ON studb.* TO 'admin'@'localhost';
+echo    CREATE DATABASE IF NOT EXISTS score_system DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+echo    CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin123456';
+echo    GRANT ALL PRIVILEGES ON score_system.* TO 'admin'@'localhost';
 echo    FLUSH PRIVILEGES;
-echo    USE studb;
+echo    USE score_system;
 echo    SOURCE init.sql;
 echo.
 
@@ -54,7 +54,7 @@ echo.
 echo 📍 完成后的连接信息:
 echo    主机: localhost
 echo    端口: 3306
-echo    数据库: studb
+echo    数据库: score_system
 echo    用户名: admin
 echo    密码: admin123456
 echo.

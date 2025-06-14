@@ -21,7 +21,7 @@ public interface UserMapper extends BaseMapper<User> {
      * @param userType 用户类型
      * @return User
      */
-    User selectByUsernameAndUserType(@Param("username") String username, @Param("userType") Integer userType);
+    User selectByUsernameAndType(@Param("username") String username, @Param("userType") Integer userType);
 
     /**
      * 根据用户编号和用户类型查询用户

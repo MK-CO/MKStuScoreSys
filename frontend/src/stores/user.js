@@ -8,6 +8,13 @@ export const useUserStore = defineStore('user', () => {
   const token = ref(Cookies.get('token') || '')
   const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || 'null'))
 
+  // 添加调试信息
+  console.log('用户Store初始化:', {
+    token: token.value,
+    userInfo: userInfo.value,
+    localStorage: localStorage.getItem('userInfo')
+  })
+
   // 计算属性
   const isLoggedIn = computed(() => !!token.value)
   const userTypeName = computed(() => {
@@ -25,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
     try {
       const response = await loginApi(loginForm)
       if (response.code === 200) {
-        const { token: newToken, tokenHead, ...userData } = response.data
+        const { token: newToken, tokenType, userInfo: userData } = response.data
         
         // 保存token
         token.value = newToken
@@ -34,6 +41,8 @@ export const useUserStore = defineStore('user', () => {
         // 保存用户信息
         userInfo.value = userData
         localStorage.setItem('userInfo', JSON.stringify(userData))
+        
+        console.log('登录成功，用户信息已保存:', userData)
         
         return { success: true, data: response.data }
       } else {

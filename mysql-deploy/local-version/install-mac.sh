@@ -33,24 +33,22 @@ mysql_secure_installation
 
 # 创建数据库和用户
 echo "创建数据库和用户..."
-mysql -u root -p << 'EOF'
-CREATE DATABASE IF NOT EXISTS studb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin123456';
-GRANT ALL PRIVILEGES ON studb.* TO 'admin'@'localhost';
+mysql -u root -p << EOF
+CREATE DATABASE IF NOT EXISTS score_system DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'admin123456';
+GRANT ALL PRIVILEGES ON score_system.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
 # 导入初始数据
-if [ -f "init.sql" ]; then
-    echo "导入初始数据..."
-    mysql -u root -p studb < init.sql
-fi
+echo "正在导入初始数据..."
+mysql -u root -p score_system < init.sql
 
 echo "✅ MySQL 安装完成!"
 echo "📍 MySQL 连接信息:"
 echo "   主机: localhost"
 echo "   端口: 3306"
-echo "   数据库: studb"
+echo "   数据库: score_system"
 echo "   管理员用户: admin"
 echo "   管理员密码: admin123456"
 echo ""

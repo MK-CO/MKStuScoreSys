@@ -5,7 +5,7 @@ import com.mkstu.score.entity.User;
 import com.mkstu.score.vo.LoginResponse;
 
 /**
- * 用户服务接口
+ * 用户Service接口
  *
  * @author MKStu
  * @date 2024-01-01
@@ -21,13 +21,13 @@ public interface UserService {
     LoginResponse login(LoginRequest loginRequest);
 
     /**
-     * 根据用户名和用户类型查询用户
+     * 根据用户名和用户类型获取用户信息
      *
      * @param username 用户名
      * @param userType 用户类型
-     * @return User
+     * @return 用户信息
      */
-    User getUserByUsernameAndUserType(String username, Integer userType);
+    User getUserByUsernameAndType(String username, Integer userType);
 
     /**
      * 根据用户ID查询用户
@@ -38,7 +38,7 @@ public interface UserService {
     User getUserById(Long userId);
 
     /**
-     * 更新用户最后登录时间
+     * 更新最后登录时间
      *
      * @param userId 用户ID
      */
