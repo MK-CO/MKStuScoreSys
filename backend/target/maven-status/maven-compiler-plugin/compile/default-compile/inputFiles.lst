@@ -1,0 +1,12 @@
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/utils/JwtTokenUtil.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/controller/AuthController.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/service/UserService.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/dto/LoginRequest.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/mapper/UserMapper.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/entity/User.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/common/ResultCode.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/config/SecurityConfig.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/common/Result.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/service/impl/UserServiceImpl.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/vo/LoginResponse.java
+/Users/liumingkang/Code/MKStuScoreSys/backend/src/main/java/com/mkstu/score/ScoreSystemApplication.java
