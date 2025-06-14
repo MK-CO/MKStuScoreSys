@@ -99,25 +99,34 @@
         </el-table-column>
         <el-table-column prop="lastLogin" label="最后登录" width="160" />
         <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column label="操作" fixed="right" width="250">
+        <el-table-column label="操作" fixed="right" width="120">
           <template #default="{ row }">
-            <el-button size="small" @click="viewAccount(row)">查看</el-button>
-            <el-button size="small" type="primary" @click="editAccount(row)">编辑</el-button>
-            <el-button 
-              size="small" 
-              :type="row.status === 'active' ? 'warning' : 'success'"
-              @click="toggleStatus(row)"
-            >
-              {{ row.status === 'active' ? '禁用' : '启用' }}
-            </el-button>
-            <el-popconfirm
-              title="确定要删除这个账号吗？"
-              @confirm="deleteAccount(row)"
-            >
-              <template #reference>
-                <el-button size="small" type="danger">删除</el-button>
+            <el-dropdown @command="(command) => handleCommand(command, row)">
+              <el-button size="small" type="primary">
+                操作
+                <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="view">
+                    <el-icon><View /></el-icon>
+                    查看详情
+                  </el-dropdown-item>
+                  <el-dropdown-item command="edit">
+                    <el-icon><Edit /></el-icon>
+                    编辑账户
+                  </el-dropdown-item>
+                  <el-dropdown-item command="toggle" divided>
+                    <el-icon><Switch /></el-icon>
+                    {{ row.status === 'active' ? '禁用账户' : '启用账户' }}
+                  </el-dropdown-item>
+                  <el-dropdown-item command="delete" divided>
+                    <el-icon><Delete /></el-icon>
+                    删除账户
+                  </el-dropdown-item>
+                </el-dropdown-menu>
               </template>
-            </el-popconfirm>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -317,7 +326,7 @@
 <script>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Delete, Download, Upload, UploadFilled } from '@element-plus/icons-vue'
+import { Search, Plus, Delete, Download, Upload, UploadFilled, ArrowDown, View, Edit, Switch } from '@element-plus/icons-vue'
 
 export default {
   name: 'AccountManagement',
@@ -327,7 +336,11 @@ export default {
     Delete,
     Download,
     Upload,
-    UploadFilled
+    UploadFilled,
+    ArrowDown,
+    View,
+    Edit,
+    Switch
   },
   setup() {
     const loading = ref(false)
@@ -729,6 +742,24 @@ export default {
       importDialogVisible.value = false
     }
 
+    // 处理命令
+    const handleCommand = (command, row) => {
+      switch (command) {
+        case 'view':
+          viewAccount(row)
+          break
+        case 'edit':
+          editAccount(row)
+          break
+        case 'toggle':
+          toggleStatus(row)
+          break
+        case 'delete':
+          deleteAccount(row)
+          break
+      }
+    }
+
     onMounted(() => {
       // 初始化数据
       totalAccounts.value = accounts.value.length
@@ -775,7 +806,8 @@ export default {
       exportData,
       importData,
       handleFileChange,
-      confirmImport
+      confirmImport,
+      handleCommand
     }
   }
 }

@@ -45,10 +45,26 @@
       </el-table-column>
       <el-table-column prop="grade" label="等级" width="80" />
       <el-table-column prop="createTime" label="录入时间" />
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="120">
         <template #default="scope">
-          <el-button size="small" @click="editScore(scope.row)">编辑</el-button>
-          <el-button size="small" type="danger" @click="deleteScore(scope.row)">删除</el-button>
+          <el-dropdown @command="(command) => handleCommand(command, scope.row)">
+            <el-button size="small" type="primary">
+              操作
+              <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="edit">
+                  <el-icon><Edit /></el-icon>
+                  编辑成绩
+                </el-dropdown-item>
+                <el-dropdown-item command="delete" divided>
+                  <el-icon><Delete /></el-icon>
+                  删除成绩
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -109,7 +125,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, ArrowDown, Edit, Delete } from '@element-plus/icons-vue'
 
 const loading = ref(false)
 const scores = ref([])
@@ -321,6 +337,14 @@ const resetFilter = () => {
     semester: ''
   }
   loadScores()
+}
+
+const handleCommand = (command, score) => {
+  if (command === 'edit') {
+    editScore(score)
+  } else if (command === 'delete') {
+    deleteScore(score)
+  }
 }
 </script>
 

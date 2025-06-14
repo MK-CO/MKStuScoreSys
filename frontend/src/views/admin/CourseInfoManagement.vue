@@ -43,27 +43,23 @@
       >
         <el-table-column type="selection" width="55" />
         
-        <el-table-column prop="courseCode" label="课程编码" width="120" />
+        <el-table-column prop="courseNo" label="课程编码" width="120" />
         
         <el-table-column prop="courseName" label="课程名称" min-width="150" />
         
-        <el-table-column prop="credits" label="学分" width="80" align="center" />
+        <el-table-column prop="credit" label="学分" width="80" align="center" />
         
-        <el-table-column prop="courseType" label="课程类型" width="100">
+        <el-table-column prop="courseType" label="课程类型" width="120">
           <template #default="{ row }">
             <el-tag :type="getCourseTypeTagType(row.courseType)">
-              {{ getCourseTypeText(row.courseType) }}
+              {{ row.courseType }}
             </el-tag>
           </template>
         </el-table-column>
         
-        <el-table-column prop="department" label="开课院系" min-width="120" />
+        <el-table-column prop="teacherId" label="教师ID" width="100" align="center" />
         
-        <el-table-column prop="teacher" label="授课教师" width="100" />
-        
-        <el-table-column prop="capacity" label="容量" width="80" align="center" />
-        
-        <el-table-column prop="enrolled" label="已选" width="80" align="center" />
+        <el-table-column prop="semester" label="学期" width="100" />
         
         <el-table-column prop="status" label="状态" width="80">
           <template #default="{ row }">
@@ -73,17 +69,36 @@
           </template>
         </el-table-column>
         
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column prop="createTime" label="创建时间" width="160">
           <template #default="{ row }">
-            <el-button size="small" @click="handleEdit(row)">
-              编辑
-            </el-button>
-            <el-button size="small" type="info" @click="handleView(row)">
-              详情
-            </el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row)">
-              删除
-            </el-button>
+            {{ formatDateTime(row.createTime) }}
+          </template>
+        </el-table-column>
+        
+        <el-table-column label="操作" width="120" fixed="right">
+          <template #default="{ row }">
+            <el-dropdown @command="(command) => handleCommand(command, row)">
+              <el-button size="small" type="primary">
+                操作
+                <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit">
+                    <el-icon><Edit /></el-icon>
+                    编辑课程
+                  </el-dropdown-item>
+                  <el-dropdown-item command="view">
+                    <el-icon><View /></el-icon>
+                    查看详情
+                  </el-dropdown-item>
+                  <el-dropdown-item command="delete" divided>
+                    <el-icon><Delete /></el-icon>
+                    删除课程
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -114,36 +129,34 @@
         :rules="rules"
         label-width="100px"
       >
-        <el-form-item label="课程编码" prop="courseCode">
-          <el-input v-model="form.courseCode" placeholder="请输入课程编码" />
+        <el-form-item label="课程编码" prop="courseNo">
+          <el-input v-model="form.courseNo" placeholder="请输入课程编码" />
         </el-form-item>
         
         <el-form-item label="课程名称" prop="courseName">
           <el-input v-model="form.courseName" placeholder="请输入课程名称" />
         </el-form-item>
         
-        <el-form-item label="学分" prop="credits">
-          <el-input-number v-model="form.credits" :min="0" :max="10" :precision="1" />
+        <el-form-item label="学分" prop="credit">
+          <el-input-number v-model="form.credit" :min="0" :max="10" :precision="1" />
         </el-form-item>
         
         <el-form-item label="课程类型" prop="courseType">
           <el-select v-model="form.courseType" placeholder="请选择课程类型">
-            <el-option label="必修课" :value="1" />
-            <el-option label="选修课" :value="2" />
-            <el-option label="实践课" :value="3" />
+            <el-option label="专业必修" value="专业必修" />
+            <el-option label="专业选修" value="专业选修" />
+            <el-option label="公共必修" value="公共必修" />
+            <el-option label="公共选修" value="公共选修" />
+            <el-option label="实践课程" value="实践课程" />
           </el-select>
         </el-form-item>
         
-        <el-form-item label="开课院系" prop="department">
-          <el-input v-model="form.department" placeholder="请输入开课院系" />
+        <el-form-item label="教师ID" prop="teacherId">
+          <el-input-number v-model="form.teacherId" :min="1" placeholder="请输入教师ID" />
         </el-form-item>
         
-        <el-form-item label="授课教师" prop="teacher">
-          <el-input v-model="form.teacher" placeholder="请输入授课教师" />
-        </el-form-item>
-        
-        <el-form-item label="课程容量" prop="capacity">
-          <el-input-number v-model="form.capacity" :min="1" :max="500" />
+        <el-form-item label="学期" prop="semester">
+          <el-input v-model="form.semester" placeholder="如：2024-1" />
         </el-form-item>
         
         <el-form-item label="课程描述" prop="description">
@@ -176,7 +189,7 @@
       <div class="course-detail" v-if="currentCourse">
         <div class="detail-item">
           <label>课程编码：</label>
-          <span>{{ currentCourse.courseCode }}</span>
+          <span>{{ currentCourse.courseNo }}</span>
         </div>
         <div class="detail-item">
           <label>课程名称：</label>
@@ -184,29 +197,33 @@
         </div>
         <div class="detail-item">
           <label>学分：</label>
-          <span>{{ currentCourse.credits }}</span>
+          <span>{{ currentCourse.credit }}</span>
         </div>
         <div class="detail-item">
           <label>课程类型：</label>
-          <span>{{ getCourseTypeText(currentCourse.courseType) }}</span>
+          <span>{{ currentCourse.courseType }}</span>
         </div>
         <div class="detail-item">
-          <label>开课院系：</label>
-          <span>{{ currentCourse.department }}</span>
+          <label>教师ID：</label>
+          <span>{{ currentCourse.teacherId }}</span>
         </div>
         <div class="detail-item">
-          <label>授课教师：</label>
-          <span>{{ currentCourse.teacher }}</span>
-        </div>
-        <div class="detail-item">
-          <label>容量/已选：</label>
-          <span>{{ currentCourse.capacity }} / {{ currentCourse.enrolled }}</span>
+          <label>学期：</label>
+          <span>{{ currentCourse.semester }}</span>
         </div>
         <div class="detail-item">
           <label>状态：</label>
           <el-tag :type="currentCourse.status === 1 ? 'success' : 'danger'">
             {{ currentCourse.status === 1 ? '开放' : '关闭' }}
           </el-tag>
+        </div>
+        <div class="detail-item">
+          <label>创建时间：</label>
+          <span>{{ formatDateTime(currentCourse.createTime) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>更新时间：</label>
+          <span>{{ formatDateTime(currentCourse.updateTime) }}</span>
         </div>
         <div class="detail-item" v-if="currentCourse.description">
           <label>课程描述：</label>
@@ -220,7 +237,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus, Delete, Search } from '@element-plus/icons-vue'
+import { Plus, Delete, Search, Edit, View, ArrowDown } from '@element-plus/icons-vue'
 import { 
   getCourseList, 
   createCourse, 
@@ -247,39 +264,35 @@ const currentCourse = ref(null)
 // 表单
 const formRef = ref()
 const form = reactive({
-  courseCode: '',
+  courseNo: '',
   courseName: '',
-  credits: 0,
-  courseType: 1,
-  department: '',
-  teacher: '',
-  capacity: 30,
+  credit: 0,
+  courseType: '',
+  teacherId: 0,
+  semester: '',
   description: '',
   status: 1
 })
 
 // 表单验证规则
 const rules = {
-  courseCode: [
+  courseNo: [
     { required: true, message: '请输入课程编码', trigger: 'blur' }
   ],
   courseName: [
     { required: true, message: '请输入课程名称', trigger: 'blur' }
   ],
-  credits: [
+  credit: [
     { required: true, message: '请输入学分', trigger: 'blur' }
   ],
   courseType: [
     { required: true, message: '请选择课程类型', trigger: 'change' }
   ],
-  department: [
-    { required: true, message: '请输入开课院系', trigger: 'blur' }
+  teacherId: [
+    { required: true, message: '请输入教师ID', trigger: 'blur' }
   ],
-  teacher: [
-    { required: true, message: '请输入授课教师', trigger: 'blur' }
-  ],
-  capacity: [
-    { required: true, message: '请输入课程容量', trigger: 'blur' }
+  semester: [
+    { required: true, message: '请输入学期', trigger: 'blur' }
   ]
 }
 
@@ -288,12 +301,12 @@ const hasSelection = computed(() => selectedCourses.value.length > 0)
 
 // 方法
 const getCourseTypeText = (type) => {
-  const typeMap = { 1: '必修课', 2: '选修课', 3: '实践课' }
+  const typeMap = { '专业必修': '专业必修', '专业选修': '专业选修', '公共必修': '公共必修', '公共选修': '公共选修', '实践课程': '实践课程' }
   return typeMap[type] || '未知'
 }
 
 const getCourseTypeTagType = (type) => {
-  const typeMap = { 1: 'danger', 2: 'warning', 3: 'success' }
+  const typeMap = { '专业必修': 'danger', '专业选修': 'warning', '公共必修': 'success', '公共选修': 'info', '实践课程': 'success' }
   return typeMap[type] || ''
 }
 
@@ -308,8 +321,8 @@ const loadCourses = async () => {
     
     const response = await getCourseList(params)
     if (response.code === 200) {
-      courses.value = response.data.records
-      total.value = response.data.total
+      courses.value = response.data.records || []
+      total.value = response.data.total || response.data.records?.length || 0
     } else {
       ElMessage.error(response.message || '加载课程数据失败')
     }
@@ -427,13 +440,12 @@ const handleSubmit = async () => {
 
 const resetForm = () => {
   Object.assign(form, {
-    courseCode: '',
+    courseNo: '',
     courseName: '',
-    credits: 0,
-    courseType: 1,
-    department: '',
-    teacher: '',
-    capacity: 30,
+    credit: 0,
+    courseType: '',
+    teacherId: 0,
+    semester: '',
     description: '',
     status: 1
   })
@@ -448,6 +460,21 @@ const handleSizeChange = (size) => {
 const handleCurrentChange = (page) => {
   currentPage.value = page
   loadCourses()
+}
+
+const handleCommand = (command, row) => {
+  if (command === 'edit') {
+    handleEdit(row)
+  } else if (command === 'view') {
+    handleView(row)
+  } else if (command === 'delete') {
+    handleDelete(row)
+  }
+}
+
+const formatDateTime = (timestamp) => {
+  const date = new Date(timestamp)
+  return date.toLocaleString()
 }
 
 // 生命周期
